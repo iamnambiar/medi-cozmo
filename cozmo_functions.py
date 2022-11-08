@@ -5,7 +5,7 @@ import math
 import time
 import datetime
 import cozmo
-from cozmo.util import degrees, distance_mm, Pose
+from cozmo.util import degrees, distance_mm, Pose, speed_mmps
 
 def detect_face_pose(robot: cozmo.robot.Robot, timeout=30.0, name="sheena"):
     lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.FindFaces)
@@ -51,6 +51,12 @@ def detect_cubes(robot: cozmo.robot.Robot):
     lookaround.stop()
     return cubes
 
-
-
+def react_robot_tap_cube(robot:cozmo.robot.Robot, cube:cozmo.objects.LightCube, error_text):
+    while True:
+        try:
+            cube.wait_for_tap(timeout=10)
+            break
+        except asyncio.TimeoutError:
+            robot.play_anim_trigger(cozmo.anim.Triggers.CodeLabFrustrated, use_lift_safe=True, ignore_body_track=True).wait_for_completed()
+            robot.say_text(error_text).wait_for_completed()
         
